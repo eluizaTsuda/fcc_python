@@ -25,32 +25,46 @@ def arithmetic_arranger(problems, answer=False):
         print(checkProblem)
         lstProblem = splitProblem(checkProblem) 
 
-        if lstProblem[3] == False:  # regex invalid
-            print("---------------------- Retorno do splitProblem ")
-            print(lstProblem[0])
-            print(lstProblem[1])
-            print(lstProblem[2])
-            first = lstProblem[0]
-            operator = lstProblem[1]
-            second = lstProblem[2]
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>> Retorno do splitProblem")
+        print(lstProblem)
+
+        if lstProblem[0] == False:
+            if lstProblem[1] == 1:
+                return("Error: Operator must be '+' or '-'.")
+            elif lstProblem[1] == 2:
+                return("Error: Numbers must only contain digits.")
+            elif lstProblem[1] == 3:
+                return("Error: Numbers cannot be more than four digits.")
+            else:
+                return("Error: Different pattern")
+
+
+        #if lstProblem[3] == False:  # regex invalid
+        #    print("---------------------- Retorno do splitProblem ")
+        #    print(lstProblem[0])
+        #    print(lstProblem[1])
+        #    print(lstProblem[2])
+        #    first = lstProblem[0]
+        #    operator = lstProblem[1]
+        #    second = lstProblem[2]
 
             #---------------------- ">>>>>>>>>>>>>>>>>>> checking the operator '+' and '-'"       
             #retOperator = (re.findall('[^0-9]+', checkProblem))
             #if (retOperator[0]).strip() != "+" and (retOperator[0]).strip() != "-":
 
-            if operator != "+" and operator != "-":
-                return("Error: Operator must be '+' or '-'.")
+        #    if operator != "+" and operator != "-":
+        #        return("Error: Operator must be '+' or '-'.")
 
             #---------------------- ">>>>>>>>>>>>>>>>>>> Numbers must only contain digits"  
-            print(">>>>>>>>>>>>>>>>>>> Numbers must only contain digits" ) 
+        #    print(">>>>>>>>>>>>>>>>>>> Numbers must only contain digits" ) 
     
             #if type(lstProblem[0]) != int or type(lstProblem[2]) != int:
-            if type(first) != int or type(second) != int:
-                return("Error: Numbers must only contain digits.")
+        #    if type(first) != int or type(second) != int:
+        #        return("Error: Numbers must only contain digits.")
             
             #---------------------- ">>>>>>>>>>>>>>>>>>> Numbers cannot be more than four digits."       
-            if len(lstProblem[0]) > 4 or len(lstProblem[2]) > 4:
-                return("Error: Numbers cannot be more than four digits.")
+        #    if len(lstProblem[0]) > 4 or len(lstProblem[2]) > 4:
+        #        return("Error: Numbers cannot be more than four digits.")
 
 
 
@@ -126,7 +140,7 @@ def splitProblem(oneProblem):
     lstOneProblem = []
 
     pattern = r"\d{1,4}[0-9]\s\W\s\d{1,4}[0-9]"
-    pattern = r"\d[0-9]{1,4}\s\-\s\d{1,4}[0-9]|\d[0-9]{1,4}\s\+\s\d{1,4}[0-9]"
+    pattern = r"^\d{1,4}\s\-\s\d{1,4}$|^\d{1,4}\s\+\s\d{1,4}$|^\d{1,4}\-\d{1,4}$|^\d{1,4}\+\d{1,4}$"
     bMatch = bool(re.match(pattern, oneProblem))
 
     print(bMatch)
@@ -135,24 +149,69 @@ def splitProblem(oneProblem):
         pos = re.search("[\+\-]", oneProblem)
         atpos = pos.start()
         print("position bMatch True = ", atpos)
+        lstOneProblem.append(bMatch)
 
     else:
-        pattern = r"\s\W\s"
+        pattern = "\s\W\s|\d\W\d"
         retOperator = (re.findall(pattern, oneProblem))
-        pos = re.findall(pattern, oneProblem)
-        atpos = oneProblem.index(pos[0].strip())
-        print("position bMatch False = ", atpos)
-        print("================================================= here")
+        print("#---------------------- >>>>>>>>>>> Different Pattern")
+        print(retOperator)
+        if len(retOperator) == 0:
+            #---------------------- ">>>>>>>>>>> Different Pattern" 
+            lstOneProblem.append(bMatch)
+            lstOneProblem.append(4)
+        else:        
+            pos = re.findall(pattern, oneProblem)
+            print(pos)
+            atpos = oneProblem.index(pos[0].strip())
+            print(atpos)
 
-    print(oneProblem[:atpos].strip())   # first
-    print(oneProblem[atpos].strip())   # operator
-    print(oneProblem[atpos+1:].strip()) # second
+
+            print("position bMatch False = ", atpos)
+            print(oneProblem[:atpos].strip())   # first
+            print(oneProblem[atpos].strip())   # operator
+            print(oneProblem[atpos+1:].strip()) # second
+            print("================================================= here")
+
+            firstPart = oneProblem[:atpos].strip()
+            operator = oneProblem[atpos].strip()
+            secondPart = oneProblem[atpos+1:].strip()
+
+            print(">>>> firstPart  <<<<< " + firstPart)   # first
+            print(">>>> operator   <<<<< " + operator)     # operator
+            print(">>>> secondPart <<<<< " + secondPart)  # second
+
+            if operator != "+" and operator != "-":
+                #---------------------- ">>>>>>>>>>> Operators accept are **addition** and **subtraction**." 
+                lstOneProblem.append(bMatch)
+                lstOneProblem.append(1)
             
-          
-    lstOneProblem.append((oneProblem[:atpos]).strip())   # first
-    lstOneProblem.append((oneProblem[atpos]).strip())    # operator
-    lstOneProblem.append((oneProblem[atpos+1:]).strip()) # second
-    lstOneProblem.append(bMatch)
+            #---------------------- ">>>>>>>>>>>>>>> Numbers must only contain digits"  
+                #print(">>>>>>>>>>>>>>>>>>> Numbers must only contain digits" ) 
+        
+                #if type(lstProblem[0]) != int or type(lstProblem[2]) != int:
+                #if type(first) != int or type(second) != int:
+                #    return("Error: Numbers must only contain digits.")
+                
+        
+            elif len(firstPart) > 4 or len(secondPart) > 4:
+                #---------------------- ">>>>>>>>>>> Numbers cannot be more than four digits."  
+                lstOneProblem.append(bMatch)
+                lstOneProblem.append(3)
+            else: 
+                #---------------------- ">>>>>>>>>>> Different Pattern" 
+                lstOneProblem.append(bMatch)
+                lstOneProblem.append(4)
+
+
+    #-------------------------------------------------
+
+            
+    #lstOneProblem.append(bMatch)
+    #lstOneProblem.append((oneProblem[:atpos]).strip())   # first
+    #lstOneProblem.append((oneProblem[atpos]).strip())    # operator
+    #lstOneProblem.append((oneProblem[atpos+1:]).strip()) # second
+
 
     print("---------------------------- saindo da funcao ")
     print (lstOneProblem)
