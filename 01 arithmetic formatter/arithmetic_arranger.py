@@ -21,20 +21,36 @@ def arithmetic_arranger(problems, answer=False):
     
 
     for checkProblem in problems:
-        #---------------------- ">>>>>>>>>>>>>>>>>>> checking the operator '+' and '-'"       
-        retOperator = (re.findall('[^0-9]+', checkProblem))
-        if (retOperator[0]).strip() != "+" and (retOperator[0]).strip() != "-":
-            return("Error: Operator must be '+' or '-'.")
+        print("1 - checkProblem")
+        print(checkProblem)
+        lstProblem = splitProblem(checkProblem) 
 
-        #---------------------- ">>>>>>>>>>>>>>>>>>> Numbers must only contain digits"  
-        print(">>>>>>>>>>>>>>>>>>> Numbers must only contain digits" ) 
-        lstProblem = splitProblem(checkProblem)  
-        if type(lstProblem[0]) != int or type(lstProblem[2]) != int:
-            return("Error: Numbers must only contain digits.")
-        
-        #---------------------- ">>>>>>>>>>>>>>>>>>> Numbers cannot be more than four digits."       
-        if len(lstProblem[0]) > 4 or len(lstProblem[2]) > 4:
-            return("Error: Numbers cannot be more than four digits.")
+        if lstProblem[3] == False:  # regex invalid
+            print("---------------------- Retorno do splitProblem ")
+            print(lstProblem[0])
+            print(lstProblem[1])
+            print(lstProblem[2])
+            first = lstProblem[0]
+            operator = lstProblem[1]
+            second = lstProblem[2]
+
+            #---------------------- ">>>>>>>>>>>>>>>>>>> checking the operator '+' and '-'"       
+            #retOperator = (re.findall('[^0-9]+', checkProblem))
+            #if (retOperator[0]).strip() != "+" and (retOperator[0]).strip() != "-":
+
+            if operator != "+" and operator != "-":
+                return("Error: Operator must be '+' or '-'.")
+
+            #---------------------- ">>>>>>>>>>>>>>>>>>> Numbers must only contain digits"  
+            print(">>>>>>>>>>>>>>>>>>> Numbers must only contain digits" ) 
+    
+            #if type(lstProblem[0]) != int or type(lstProblem[2]) != int:
+            if type(first) != int or type(second) != int:
+                return("Error: Numbers must only contain digits.")
+            
+            #---------------------- ">>>>>>>>>>>>>>>>>>> Numbers cannot be more than four digits."       
+            if len(lstProblem[0]) > 4 or len(lstProblem[2]) > 4:
+                return("Error: Numbers cannot be more than four digits.")
 
 
 
@@ -109,17 +125,35 @@ def splitProblem(oneProblem):
 
     lstOneProblem = []
 
-    pos = re.search("[\+\-]", oneProblem)
-    atpos = pos.start()
-    print("position = ", atpos)
-    
-    #first = (oneProblem[:atpos]).strip()
-    #second = (oneProblem[atpos+1:]).strip()
-    #operator = oneProblem[atpos].strip()
+    pattern = r"\d{1,4}[0-9]\s\W\s\d{1,4}[0-9]"
+    pattern = r"\d[0-9]{1,4}\s\-\s\d{1,4}[0-9]|\d[0-9]{1,4}\s\+\s\d{1,4}[0-9]"
+    bMatch = bool(re.match(pattern, oneProblem))
 
-    lstOneProblem.append((oneProblem[:atpos]).strip())
-    lstOneProblem.append((oneProblem[atpos]).strip())
-    lstOneProblem.append((oneProblem[atpos+1:]).strip())
+    print(bMatch)
 
+    if bMatch == True:
+        pos = re.search("[\+\-]", oneProblem)
+        atpos = pos.start()
+        print("position bMatch True = ", atpos)
+
+    else:
+        pattern = r"\s\W\s"
+        retOperator = (re.findall(pattern, oneProblem))
+        pos = re.findall(pattern, oneProblem)
+        atpos = oneProblem.index(pos[0].strip())
+        print("position bMatch False = ", atpos)
+        print("================================================= here")
+
+    print(oneProblem[:atpos].strip())   # first
+    print(oneProblem[atpos].strip())   # operator
+    print(oneProblem[atpos+1:].strip()) # second
+            
+          
+    lstOneProblem.append((oneProblem[:atpos]).strip())   # first
+    lstOneProblem.append((oneProblem[atpos]).strip())    # operator
+    lstOneProblem.append((oneProblem[atpos+1:]).strip()) # second
+    lstOneProblem.append(bMatch)
+
+    print("---------------------------- saindo da funcao ")
     print (lstOneProblem)
     return (lstOneProblem)
