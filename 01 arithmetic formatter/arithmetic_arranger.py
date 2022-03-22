@@ -2,7 +2,6 @@
 import re
 
 def arithmetic_arranger(problems, answer=False):
-    # C:\@Luiza_Local\MyProjects\fcc\python\01 arithmetic formatter
 
     arranged_problems= ''
     first = ''
@@ -13,7 +12,6 @@ def arithmetic_arranger(problems, answer=False):
     lst_second = []
     lst_dashes = []
     lst_answer = []
-    i = 0
 
     if (len(problems) > 5 ):
         #---------------------- ">>>>>>>>>>>>>>>>>>> checking limit = 5 
@@ -35,8 +33,6 @@ def arithmetic_arranger(problems, answer=False):
 
     for setProblem in problems:
         #---------------------- ">>>>>>>>>>>>>>>>>>> Problem assembly
-        #print("# ---------------------- >>>>>>>>>>>>>>>>>>> Problem assembly")      
-        #print("setProblem = " + setProblem)
 
         x = re.search("[\+\-]", setProblem)
         atpos = x.start()
@@ -44,10 +40,6 @@ def arithmetic_arranger(problems, answer=False):
         first = (setProblem[:atpos]).strip()
         second = (setProblem[atpos+1:]).strip()
         operator = setProblem[atpos].strip()
-
-        #print(" >>>>>>     first: " + first)
-        #print(" >>>>>>  operacao: " + operator)
-        #print(" >>>>>>    second: " + second)
 
         if len(first) > len(second):
             diference = len(first) - len(second)
@@ -57,40 +49,35 @@ def arithmetic_arranger(problems, answer=False):
             diference = len(second) - len(first)
             lnfirst  = first.rjust(len(first) + diference + 2," ")
             lnsecond = operator + second.rjust(len(second) + 1," ") # one space before operator
-
-        #print("length  first: " + str(len(lnfirst)) + " - " + lnfirst)
-        #print("length second: " + str(len(lnsecond)) + " - " + lnsecond)
-        
-        lst_first.append(lnfirst.ljust(len(lnfirst) + 4, "."))
-        lst_second.append(lnsecond.ljust(len(lnsecond) + 4, "."))
-        lst_dashes.append((dashes.rjust(len(lnsecond), "-")).ljust(len(lnsecond) + 4, "."))
+     
+        lst_first.append(lnfirst.ljust(len(lnfirst) + 4, " "))
+        lst_second.append(lnsecond.ljust(len(lnsecond) + 4, " "))
+        lst_dashes.append((dashes.rjust(len(lnsecond), "-")).ljust(len(lnsecond) + 4, " "))
 
         if answer == True:
             if operator == "+":
-                lst_answer.append((str(int(first) + int(second)).rjust(len(lnsecond), " ").ljust(len(lnsecond) + 4, ".")))
+                lst_answer.append((str(int(first) + int(second)).rjust(len(lnsecond), " ").ljust(len(lnsecond) + 4, " ")))
             else:
-                lst_answer.append((str(int(first) - int(second)).rjust(len(lnsecond), " ").ljust(len(lnsecond) + 4, ".")))
-
-    #print(lst_first)
-    #print(lst_second)
-    #print(lst_dashes)
-    #print(lst_answer)
-
+                lst_answer.append((str(int(first) - int(second)).rjust(len(lnsecond), " ").ljust(len(lnsecond) + 4, " ")))
+ 
     for concat in lst_first:  # Assembly the first line
         arranged_problems += concat
-    arranged_problems += '\n'
+    arranged_problems = arranged_problems.rstrip() + '\n'
 
     for concat in lst_second: # Assembly the second line
         arranged_problems += concat
-    arranged_problems += '\n'
+    arranged_problems = arranged_problems.rstrip() + '\n'
     
     for concat in lst_dashes: # Assembly the dashes line
         arranged_problems += concat
-    arranged_problems += '\n'
 
-    for concat in lst_answer: # Assembly the answer line
-        arranged_problems += concat
-    arranged_problems += '\n'
+    if answer == True:  # should show the results
+        arranged_problems = arranged_problems.rstrip() + '\n' # dashes line
+        for concat in lst_answer: # Assembly the answer line
+            arranged_problems += concat
+        arranged_problems = arranged_problems.rstrip()
+    else:
+        arranged_problems = arranged_problems.rstrip()        # dashes line
 
     return arranged_problems
 
@@ -107,7 +94,6 @@ def splitProblem(oneProblem):
         retOperator = (re.findall(pattern, oneProblem))
         if len(retOperator) == 0:
             #---------------------- ">>>>>>>>>>> Error: Different Pattern" 
-            print( "#-- >>>>>>>>>>> Error: Different Pattern --- 1 " )
             lstOneProblem.append(4)
         else: 
             #---------------------- ">>>>>>>>>>> Others Error Rules" 
@@ -132,7 +118,6 @@ def splitProblem(oneProblem):
 
             else: 
                 #-- ">>>>>>>>>>> Error: Different Pattern" 
-                print( "#-- >>>>>>>>>>> Error: Different Pattern --- 2 " )
                 lstOneProblem.append(4)
 
     return (lstOneProblem)
