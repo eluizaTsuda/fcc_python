@@ -1,15 +1,28 @@
 def add_time(start, duration, weekday = ""):
-    #add_time("11:06 PM", "2:02")
-    #add_time("3:30 PM", "2:12", "Monday")
+
+    #print(add_time("11:59 PM", "24:05")) # "12:04 AM (2 days later)"
+
     print(">>>>>>>>>>>>>>>>>>>> NEW = start: " + str(start) + " duraton: " + str(duration))
+    if duration == "0:00":
+      return start
+    
     contDays = 0
     minute = 60
     hour = 24
     minStart = 0
+    nextHour = 1
+    qtdNextDay = ""
+    period = ""
 
-    if duration == "0:00":
-      return start
-  
+    #lst_duration_hh_mm = get_hh12_mm(duration, 1)
+    #hh = lst_duration_hh_mm[0]
+    #mm = lst_duration_hh_mm[1]
+    #print("Duration split >>>> hora " + str(hh) + " | minuto: " + str(mm))
+    #if int(hh) >= 24:
+    #    qtdDays = qtdDaysAdd(hh)
+    #    print("Return function qtdDaysAdd >>>>>>>>>>>> " + str(qtdDays))
+    
+
     lstStart_24h = get_start_24h(start)
     intDuration_mm = get_duration_mm(duration)
     print("retorno da funcao get_start_24h  >>> " + lstStart_24h[0] + " " + lstStart_24h[1])
@@ -20,7 +33,7 @@ def add_time(start, duration, weekday = ""):
 
     intDifDuration_mm = int(intDuration_mm) - (int(minute) - int(minStart))
     contDays += 1
-    
+   
        
     print("1 - diference minutes: *** intDifDuration *** - ok " + str(intDifDuration_mm))
 
@@ -28,25 +41,48 @@ def add_time(start, duration, weekday = ""):
     hourAdd = intTotAdd_hhmm[0]
     minuteAdd = intTotAdd_hhmm[1]
     
-    print("Amount hours ======= " + str(hourAdd) + " | " + str(hourStart))
+    print("*** Amount hours ======= hourAdd " + str(hourAdd) + " | minuteAdd " + str(minuteAdd)  + " | hourStart " + str(hourStart) + " | nextHour " + str(nextHour))
 
+    new_time = str(int(hourStart) + int(hourAdd) + nextHour)
+    print("*** New time     =============== " + str(new_time))
   
-    if int(hourStart) == 23:
-      new_time = str(hourAdd) + ":" + (str(minuteAdd).rjust(2, '0')) + " AM"
-    
-    elif (24 - int(hourStart)) > int(hourAdd):
+    #if int(hourStart) == 23:
+    #  new_time = str(hourAdd) + ":" + (str(minuteAdd).rjust(2, '0')) + " AM"
+    #  period = "AM"
+
+
+
+    if int(hourAdd) == 0 and intDifDuration_mm > 0:
+        if int(hourStart) + nextHour >= 12:
+            period = "PM"
+        else:
+            period = "AM" 
+
+
+    if (24 - int(hourStart)) > int(hourAdd):
       # same day
-      new_time = str(int(hourStart) + int(hourAdd) + 1)
+ 
       if int(new_time) > 12:
          new_time = get_12_24_hs(new_time, "PM", 12)
+         period = "PM"
+         qtdNextDay = ""
 
-    else:
+    elif (24 - (int(hourStart) + int(nextHour)) < int(hourAdd)):
       # next day 
-      new_time="??"
+      qtdNextDay = " (next day)"
+      new_time = str(int(hourAdd) - (24 - (int(hourStart) + int(nextHour))))
+      print("*** New time next day     =============== " + str(new_time))
+
+      if int(new_time) >= 13:
+          new_time = get_12_24_hs(new_time, period, 12)
+
+      if int(new_time) < 13:
+          period = "AM"
+
       print("change to next day ") 
 
 
-    new_time += ":" + (str(minuteAdd).rjust(2, '0')) + " PM"   
+    new_time += ":" + (str(minuteAdd).rjust(2, '0')) + " " + str(period) + qtdNextDay
     #print(" >>>>>>>>>>> new_time <<<<<<<<<< " + str(new_time))
 
 
@@ -113,14 +149,14 @@ def get_12_24_hs(hh, period, type):
 
     converthhmm = hh
 
-    if period == "PM":
-      if type == 24:    # return hh format 24h
+    #if period == "PM":
+    if type == 24:    # return hh format 24h
         converthhmm = dct_12_24h[hh]
-      elif type == 12:  # return hh format 12h   
+    elif type == 12:  # return hh format 12h   
         # list out keys and values separately
         key_list = list(dct_12_24h.keys())
         val_list = list(dct_12_24h.values())
-        
+
         position = val_list.index(hh)
         converthhmm = key_list[position]
   
@@ -158,3 +194,9 @@ def get_add_hhmm(intDifDuration_mm):
     lstTotAdd_hhmm.append(int(mm_add))
 
     return(lstTotAdd_hhmm)
+
+
+def qtdDaysAdd(hh):
+
+    intDaysAdd = int(int(hh) / 24)
+    return(intDaysAdd)
