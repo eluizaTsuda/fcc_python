@@ -1,11 +1,14 @@
 def add_time(start, duration, weekday = ""):
     #add_time("11:06 PM", "2:02")
     #add_time("3:30 PM", "2:12", "Monday")
-
+    print(">>>>>>>>>>>>>>>>>>>> NEW = start: " + str(start) + " duraton: " + str(duration))
     contDays = 0
     minute = 60
     hour = 24
     minStart = 0
+
+    if duration == "0:00":
+      return start
   
     lstStart_24h = get_start_24h(start)
     intDuration_mm = get_duration_mm(duration)
@@ -17,19 +20,42 @@ def add_time(start, duration, weekday = ""):
 
     intDifDuration_mm = int(intDuration_mm) - (int(minute) - int(minStart))
     contDays += 1
+    
+       
     print("1 - diference minutes: *** intDifDuration *** - ok " + str(intDifDuration_mm))
 
-    intHourAdd = get_add_hh(intDifDuration_mm)
+    intTotAdd_hhmm = get_add_hhmm(intDifDuration_mm)
+    hourAdd = intTotAdd_hhmm[0]
+    minuteAdd = intTotAdd_hhmm[1]
+    
+    print("Amount hours ======= " + str(hourAdd) + " | " + str(hourStart))
+
+  
+    if int(hourStart) == 23:
+      new_time = str(hourAdd) + ":" + (str(minuteAdd).rjust(2, '0')) + " AM"
+    
+    elif (24 - int(hourStart)) > int(hourAdd):
+      # same day
+      new_time = str(int(hourStart) + int(hourAdd) + 1)
+      if int(new_time) > 12:
+         new_time = get_12_24_hs(new_time, "PM", 12)
+
+    else:
+      # next day 
+      new_time="??"
+      print("change to next day ") 
+
+
+    new_time += ":" + (str(minuteAdd).rjust(2, '0')) + " PM"   
+    #print(" >>>>>>>>>>> new_time <<<<<<<<<< " + str(new_time))
 
 
 
 
 
+    
 
 
-
-
-    new_time = start
     return new_time
 
 def get_hh12_mm(hhmm, ident):
@@ -62,13 +88,13 @@ def get_start_24h(hhmm):
     #ampm = hhmm[-2:]
 
     lst_ret_hh12_mm = get_hh12_mm(hhmm, 0)
-    hh = get_12_24_hs(lst_ret_hh12_mm[0], lst_ret_hh12_mm[2])
+    hh = get_12_24_hs(lst_ret_hh12_mm[0], lst_ret_hh12_mm[2], 24)
     lst_start_24h.append(hh)
     lst_start_24h.append(lst_ret_hh12_mm[1])
 
     return (lst_start_24h)
 
-def get_12_24_hs(hh, period):
+def get_12_24_hs(hh, period, type):
 #----------------------------------------------------    
     dct_12_24h = {
         "1": "13",
@@ -85,10 +111,20 @@ def get_12_24_hs(hh, period):
         "12": "24"  
     }
 
+    converthhmm = hh
+
     if period == "PM":
-        converthh = dct_12_24h[hh]
-    
-    return(converthh)
+      if type == 24:    # return hh format 24h
+        converthhmm = dct_12_24h[hh]
+      elif type == 12:  # return hh format 12h   
+        # list out keys and values separately
+        key_list = list(dct_12_24h.keys())
+        val_list = list(dct_12_24h.values())
+        
+        position = val_list.index(hh)
+        converthhmm = key_list[position]
+  
+    return(converthhmm)
 
 def get_duration_mm(hhmm):
     duration_mm = 0
@@ -107,9 +143,18 @@ def get_duration_mm(hhmm):
     return(duration_mm)
 
 #----------------------------------------------------   
-def get_add_hh(intDifDuration_mm):
+def get_add_hhmm(intDifDuration_mm):
     #Converte mm em dd e min
 
     lstTotAdd_hhmm = []
+
+    hh_add = int(intDifDuration_mm / 60)
+    mm_add = int(intDifDuration_mm % 60)
+ 
+    #print("get_add_hhmm --------- hh_add: " + str(hh_add))
+    #print("get_add_hhmm --------- mm_add: " + str(mm_add))
+
+    lstTotAdd_hhmm.append(int(hh_add))
+    lstTotAdd_hhmm.append(int(mm_add))
 
     return(lstTotAdd_hhmm)
