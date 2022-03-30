@@ -4,7 +4,9 @@ def add_time(start, duration, weekday = ""):
       return start
     
     oneMinute = 60
-    new_period = ""
+    qtdDays = 0
+    new_period = "AM"
+    strInfo = ""
 
     # get start in 24hours
     lstStart_24h = get_start_24h(start)
@@ -29,26 +31,30 @@ def add_time(start, duration, weekday = ""):
 
 
     if intDifDuration_mm >  (difComplete24h * 60): # (K > O : next day)
-        
-        difHoursNextDay = qtdHoursAdd - difComplete24h # number of hours to add - number of hours to complete 24 hours (Q = P - O)
+
+        # number of hours to add - number of hours to complete 24 hours (Q = P - O)
+        difHoursNextDay = qtdHoursAdd - difComplete24h 
+
+        if (hourFullStart + difComplete24h) >= 24: qtdDays = 1 # (M + O >= 24 (S))
+        qtdNextDaysAdd = int(difHoursNextDay / 24) # qtd next days (T)
+        qtdTotNextDays = qtdDays + qtdNextDaysAdd # (U = S + T)
 
         print("Q..Diferença de horas para o next day >>> " + str(difHoursNextDay))
-
-        if (hourFullStart + difComplete24h) >= 24:  # (M + O)
-            qtdDays = 1
+        print("S.....................................>>> " + str(qtdDays))
+        print("T.....................................>>> " + str(qtdNextDaysAdd))
+        print("U.....................................>>> " + str(qtdTotNextDays))
     
-        new_hh = "00"
-        new_mm = "00"
-        new_time = (new_hh) + ":" + (new_mm)
+        new_hh = int((intDifDuration_mm - (difComplete24h * 60) - (qtdNextDaysAdd * 24 * 60))/60)
+        new_mm = intDifDuration_mm - (qtdHoursAdd * 60)
+        strInfo = " (show qtd days)"
 
     else: # same day
         new_hh = hourFullStart + qtdHoursAdd #( M + P)
+        new_mm = intDifDuration_mm - (qtdHoursAdd * 60)
 
-        if new_hh >= 12: new_period = "PM"
-        if new_hh > 12:  new_hh = get_12_24_hs(new_hh, 12) 
-           
-        new_mm = str(intDifDuration_mm - (qtdHoursAdd * 60)).zfill(2)
-        new_time = str(new_hh) + ":" + str(new_mm) + " " + new_period
+    if new_hh >= 12: new_period = "PM"
+    if new_hh > 12:  new_hh = get_12_24_hs(new_hh, 12) 
+    new_time = str(new_hh) + ":" + str(new_mm).zfill(2) + " " + new_period + strInfo
 
  
     return(new_time)
