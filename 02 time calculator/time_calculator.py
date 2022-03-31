@@ -3,9 +3,9 @@ def add_time(start, duration, weekday = ""):
     if duration == "0:00": return start
     
     oneMinute = 60
-    qtdDays = 0
     new_period = "AM"
     strInfo = ""
+    qtdDays = 0
     qtdTotNextDays = 0
 
     # get start in 24hours
@@ -42,7 +42,6 @@ def add_time(start, duration, weekday = ""):
         new_hh = hourFullStart + qtdHoursAdd #( M + P)
         new_mm = intDifDuration_mm - (qtdHoursAdd * 60)
 
-
     if new_hh >= 12: new_period = "PM"
 
     if new_hh > 12:  
@@ -59,7 +58,9 @@ def add_time(start, duration, weekday = ""):
     return(new_time)
 
 def get_start_24h(hhmm):
-    #----------------------------------------------------
+    #-------------------------- 
+    # get start in 24hours
+
     lst_start_24h = []
     lst_ret_hh12_mm = get_hh12_mm(hhmm, 0)
 
@@ -74,9 +75,11 @@ def get_start_24h(hhmm):
     return (lst_start_24h)
 
 def get_hh12_mm(hhmm, type):
-   #--------------------------------------------
-   # hhmm >>> hhh:mm
-   # type >>> 0-start | 1-duration
+    #-------------------------- 
+    # get hh, mm, and period separately
+    # hhmm >>> hhh:mm
+    # type >>> 0-start | 1-duration
+    # return lst_hh12_mm[0]=hh | lst_hh12_mm[1]=mm | lst_hh12_mm[3]="AM | PM | ''" 
   
     lst_hh12_mm = []
 
@@ -100,7 +103,9 @@ def get_hh12_mm(hhmm, type):
     return(lst_hh12_mm)
 
 def get_12_24_hs(hh, type):
-    #----------------------------------------------------    
+    #--------------------------   
+    # type=12 return hh 24hs| type = 24 return hh 12hs
+
     dct_12_24h = {
         "1": "13",
         "2": "14",
@@ -130,7 +135,9 @@ def get_12_24_hs(hh, type):
     return(converthhmm)
 
 def get_duration_mm(hhmm):
-    #----------------------------------------------------     
+    #-------------------------- 
+    # get duration in minutes    
+
     duration_mm = 0
   
     lst_ret_hh12_mm = get_hh12_mm(hhmm, 1)
@@ -143,7 +150,9 @@ def get_duration_mm(hhmm):
     return(duration_mm)
 
 def get_weekday(weekdayStart, days):
-    #----------------------------------------------------    
+    #-------------------------- 
+    # return new weekday added of days 
+    #    
     # Monday     2 +  0 d = 2  ==> 2%7  = 2 Monday
     # Saturday   7 +  1 d = 8  ==> 8%7  = 1 Sunday
     # Wednesday  4 +  2 d = 6  ==> 6%7  = 6 Friday
@@ -173,4 +182,5 @@ def get_weekday(weekdayStart, days):
     new_WeekDay = (key_list[position]).capitalize()
   
     return(new_WeekDay)
-#----------------------------------------------------   
+
+    #--------------------------    
