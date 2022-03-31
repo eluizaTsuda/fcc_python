@@ -1,12 +1,12 @@
 def add_time(start, duration, weekday = ""):
-    print(">>>>>>>>>>>>>>>>>>>> NEW = start: " + str(start) + " duraton: " + str(duration))
-    if duration == "0:00":
-      return start
+
+    if duration == "0:00": return start
     
     oneMinute = 60
     qtdDays = 0
     new_period = "AM"
     strInfo = ""
+    qtdTotNextDays = 0
 
     # get start in 24hours
     lstStart_24h = get_start_24h(start)
@@ -17,18 +17,9 @@ def add_time(start, duration, weekday = ""):
     intDuration_mm = get_duration_mm(duration)
     intDifDuration_mm = int(intDuration_mm) - (int(oneMinute) - int(minuteStart)) # (K)
 
-    print("retorno da funcao get_start_24h (C:D) >>> " + lstStart_24h[0] + " " + lstStart_24h[1])
-    print("retorno da funcao get_duration_mm (H) >>> " + str(intDuration_mm))
-    print("Minutos a serem adcs              (K) >>> " + str(intDifDuration_mm))
-
     hourFullStart = int(hourStart) + 1 # complete full hour (M)
     difComplete24h = 24 - int(hourFullStart) # difference to complete 24:00 (O)
     qtdHoursAdd = int(intDifDuration_mm / 60) # number of hours to be added (P)
-
-    print("M...................................  >>>" + str(hourFullStart))
-    print("O...................................  >>>" + str(difComplete24h))
-    print("P...................................  >>>" + str(qtdHoursAdd))
-
 
     if intDifDuration_mm >  (difComplete24h * 60): # (K > O : next day)
 
@@ -38,27 +29,49 @@ def add_time(start, duration, weekday = ""):
         if (hourFullStart + difComplete24h) >= 24: qtdDays = 1 # (M + O >= 24 (S))
         qtdNextDaysAdd = int(difHoursNextDay / 24) # qtd next days (T)
         qtdTotNextDays = qtdDays + qtdNextDaysAdd # (U = S + T)
-
-        print("Q..Diferença de horas para o next day >>> " + str(difHoursNextDay))
-        print("S.....................................>>> " + str(qtdDays))
-        print("T.....................................>>> " + str(qtdNextDaysAdd))
-        print("U.....................................>>> " + str(qtdTotNextDays))
-    
+  
         new_hh = int((intDifDuration_mm - (difComplete24h * 60) - (qtdNextDaysAdd * 24 * 60))/60)
         new_mm = intDifDuration_mm - (qtdHoursAdd * 60)
-        strInfo = " (show qtd days)"
+
+        if qtdTotNextDays == 1:
+            strInfo = " (next day)"
+        else:
+            strInfo = " (" + str(qtdTotNextDays) + " days later)"
 
     else: # same day
         new_hh = hourFullStart + qtdHoursAdd #( M + P)
         new_mm = intDifDuration_mm - (qtdHoursAdd * 60)
 
+
     if new_hh >= 12: new_period = "PM"
-    if new_hh > 12:  new_hh = get_12_24_hs(new_hh, 12) 
+
+    if new_hh > 12:  
+        new_hh = get_12_24_hs(new_hh, 12)
+    elif new_hh == 0: 
+        new_hh = 12
+
+    if weekday != "":
+        new_weekday = get_weekday(weekday, qtdTotNextDays)
+        new_period += ", " + new_weekday 
+
     new_time = str(new_hh) + ":" + str(new_mm).zfill(2) + " " + new_period + strInfo
 
- 
     return(new_time)
 
+def get_start_24h(hhmm):
+    #----------------------------------------------------
+    lst_start_24h = []
+    lst_ret_hh12_mm = get_hh12_mm(hhmm, 0)
+
+    if lst_ret_hh12_mm[2] == "PM":
+       hh = get_12_24_hs(lst_ret_hh12_mm[0], 24)
+       lst_start_24h.append(hh)
+    else:
+       lst_start_24h.append(lst_ret_hh12_mm[0])
+    
+    lst_start_24h.append(lst_ret_hh12_mm[1]) 
+
+    return (lst_start_24h)
 
 def get_hh12_mm(hhmm, type):
    #--------------------------------------------
@@ -86,28 +99,8 @@ def get_hh12_mm(hhmm, type):
    
     return(lst_hh12_mm)
 
-def get_start_24h(hhmm):
-#----------------------------------------------------
-    lst_start_24h = []
-    #ipos = (hhmm.find(":"))
-    #hh = hhmm[:ipos]
-    #mm = hhmm[ipos+1:5]
-    #ampm = hhmm[-2:]
-
-    lst_ret_hh12_mm = get_hh12_mm(hhmm, 0)
-
-    if lst_ret_hh12_mm[2] == "PM":
-       hh = get_12_24_hs(lst_ret_hh12_mm[0], 24, lst_ret_hh12_mm[2],)
-       lst_start_24h.append(hh)
-    else:
-       lst_start_24h.append(lst_ret_hh12_mm[0])
-    
-    lst_start_24h.append(lst_ret_hh12_mm[1]) 
-
-    return (lst_start_24h)
-
-def get_12_24_hs(hh, type, period="PM"):
-#----------------------------------------------------    
+def get_12_24_hs(hh, type):
+    #----------------------------------------------------    
     dct_12_24h = {
         "1": "13",
         "2": "14",
@@ -123,7 +116,6 @@ def get_12_24_hs(hh, type, period="PM"):
         "12": "24"  
     }
 
-    #if period == "PM":
     if type == 24:    # return hh format 24h
         converthhmm = dct_12_24h[hh]
 
@@ -138,6 +130,7 @@ def get_12_24_hs(hh, type, period="PM"):
     return(converthhmm)
 
 def get_duration_mm(hhmm):
+    #----------------------------------------------------     
     duration_mm = 0
   
     lst_ret_hh12_mm = get_hh12_mm(hhmm, 1)
@@ -145,33 +138,39 @@ def get_duration_mm(hhmm):
     hh = lst_ret_hh12_mm[0]
     mm = lst_ret_hh12_mm[1]
 
-    #print("in get_duration ===== " + hhmm)
-    #print("in get_duration ===== hh: " + hh)
-    #print("in get_duration ===== mm: " + hh)
-        
     duration_mm = (int(hh) * 60) + int(mm)
   
     return(duration_mm)
 
+def get_weekday(weekdayStart, days):
+    #----------------------------------------------------    
+    # Monday     2 +  0 d = 2  ==> 2%7  = 2 Monday
+    # Saturday   7 +  1 d = 8  ==> 8%7  = 1 Sunday
+    # Wednesday  4 +  2 d = 6  ==> 6%7  = 6 Friday
+    # Tuesday    3 + 20 d = 23 ==> 23%7 = 2 Monday
+
+    dct_weekday = {
+        "sunday": "1",
+        "monday": "2",
+        "tuesday": "3",
+        "wednesday": "4",
+        "thursday": "5",
+        "friday": "6",
+        "saturday": "7"
+    }
+
+    numWeek = int(dct_weekday[weekdayStart.lower()])
+    numWeek += days
+    remainder = (numWeek % 7) 
+
+    if days == 0 or remainder == 0: return weekdayStart
+    
+    # list out keys and values separately
+    key_list = list(dct_weekday.keys())
+    val_list = list(dct_weekday.values())
+
+    position = val_list.index(str(remainder))
+    new_WeekDay = (key_list[position]).capitalize()
+  
+    return(new_WeekDay)
 #----------------------------------------------------   
-def get_add_hhmm(intDifDuration_mm):
-    #Converte mm em dd e min
-
-    lstTotAdd_hhmm = []
-
-    hh_add = int(intDifDuration_mm / 60)
-    mm_add = int(intDifDuration_mm % 60)
- 
-    #print("get_add_hhmm --------- hh_add: " + str(hh_add))
-    #print("get_add_hhmm --------- mm_add: " + str(mm_add))
-
-    lstTotAdd_hhmm.append(int(hh_add))
-    lstTotAdd_hhmm.append(int(mm_add))
-
-    return(lstTotAdd_hhmm)
-
-
-def qtdDaysAdd(hh):
-
-    intDaysAdd = int(int(hh) / 24)
-    return(intDaysAdd)
