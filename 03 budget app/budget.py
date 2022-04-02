@@ -1,3 +1,5 @@
+import re
+
 class Category:
     def __init__(self, nameCategory):
         self.category = nameCategory
@@ -7,7 +9,7 @@ class Category:
         self.ledger.append({"amount": amount, "description": description})
 
     def withdraw(self, amount, description=""):
-        if not self.check_funds(amount): 
+        if self.check_funds(amount) == False:
             return False
         else: 
             self.ledger.append({"amount": amount * (-1), "description": description})
@@ -19,17 +21,23 @@ class Category:
             currentBalance += event["amount"]
         return currentBalance
 
-    def transfer(self, amount, budgetCategory):
-        if not self.withdraw(amount, f"Transfer to {budgetCategory.category}"):
+    def check_funds(self, amount): 
+        if amount > self.get_balance():
             return False
         else:
-            budgetCategory.deposit(amount, f"Transfer from {self.category}")
             return True
 
-    def check_funds(self, amount): 
-        if self.get_balance() < amount:
+    def transfer(self, amount, budgetCategory):
+        #if not self.withdraw(amount, f"Transfer to {budgetCategory.category}"):
+        #    return False
+        #else:
+        #    budgetCategory.deposit(amount, f"Transfer from {self.category}")
+        #    return True
+        if self.check_funds(amount) == False:
             return False
         else:
+            self.withdraw(amount, f"Transfer to {budgetCategory.category}")
+            budgetCategory.deposit(amount, f"Transfer from {self.category}")
             return True
 
 
@@ -60,6 +68,35 @@ class Category:
 
         return(line_result)
 
-
 def create_spend_chart(categories):
-    pass
+    print( "  ")
+    print( "  ")
+    print( "  ")
+    print( "  ")
+
+    word_size = []
+    percent = 100
+    chart = "Percentage spent by category\n"
+
+    while percent >= 0:
+        chart += str(percent).rjust(3) + "|\n"
+        percent = percent - 10
+    
+    match = re.findall("[*+]\w+[*+]", str(categories))
+    chart += "    " + "-".rjust(1 + (3 * len(match)), "-") + "\n"
+
+    for i in range(0, len(match)):
+        word_size.append(len(match[i])-2)
+ 
+    max_size = max(word_size)
+
+    for i in range(0, len(match)):
+        match[i] = (match[i].replace("*", "")).ljust(max_size, " ")
+ 
+    for i in range(0, max_size):
+        chart += "     " + (match[0][i] + "  " + match[1][i] + "  " + match[2][i] + "\n")
+
+    return chart
+
+    
+
