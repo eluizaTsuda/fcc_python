@@ -42,7 +42,7 @@ class Category:
     line_result = line_header.ljust(num_star, "*") + self.category + line_header.rjust(num_star, "*") + "\n"  
 
     for item in self.ledger:
-      amount = "{:.2f}".format(item["amount"])
+      amount = "{:.2f}".format(item["amount"])  # two digits after the decimal point
       num_space = 30 - (len(item["description"][0:23]))
 
       line_result += item["description"][0:23] + str(amount).rjust(num_space, " ") + "\n"
@@ -88,9 +88,8 @@ def create_spend_chart(categories):
         categ_perc[categ.category] = abs(total_withdraw_categ)
     total_withdraw = abs(total_withdraw)
 
-    for key, val in categ_perc.items():
-        percent = (val / total_withdraw) * 100
-        categ_perc[key] = round(percent)
+    for key, value in categ_perc.items():
+        categ_perc[key] = round((value / total_withdraw) * 100)
     
     list_categ = list(categ_perc.keys())
     list_percent = list(categ_perc.values())
@@ -106,7 +105,9 @@ def create_spend_chart(categories):
                 chart +=  "o".ljust(3)
             else:
                 chart +=  " ".ljust(3)
-        chart = (chart.rstrip()) + "\n"            
+         
+        chart += "\n"            
+        
         percent = percent - 10
      
     # horizontal line below the bars
@@ -129,5 +130,7 @@ def create_spend_chart(categories):
       for category in range(0, len(list_categ)):
         chart += (list_categ[category][i]) + "  "
       chart += "\n"
+    
+    chart = chart[:-1]
 
     return chart
