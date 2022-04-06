@@ -1,5 +1,3 @@
-import re
-
 class Category:
   def __init__(self, nameCategory):
     self.category = nameCategory
@@ -35,14 +33,6 @@ class Category:
       budgetCategory.deposit(amount, f"Transfer from {self.category}")
       return True
 
-  def get_withdraw_amount (self):
-    amount = 0 
-    
-    for i in self.ledger:
-      if i["amount"] > 0:
-        amount += i["amount"]
-    return amount
-
   def __repr__(self):
 
     num_star = (30 - len(self.category)) // 2
@@ -64,61 +54,80 @@ class Category:
     return(line_result)
 
 def create_spend_chart(categories):
-    print( "  ")
-    print( "  ")
-    print( "  ")
-    print( "  ")
+    #------------------------------------------------------
+    #print(categories[0].ledger)
+    #[{'amount': 1000, 'description': 'initial deposit'}, 
+    # {'amount': -10.15, 'description': 'groceries'}, 
+    # {'amount': -20, 'description': 'groceries'}, 
+    # {'amount': -15.89, 'description': 'restaurant and more food for dessert'}, 
+    # {'amount': -50, 'description': 'Transfer to Clothing'}]
+    # total_withdraw_categ = 96.04
+    #print(categories[1].ledger)
+    #[{'amount': 50, 'description': 'Transfer from Food'}, 
+    # {'amount': -10, 'description': 'shoes'}]
+    # total_withdraw_categ = 10.00
+    #print(categories[2].ledger)
+    #[{'amount': 1000, 'description': 'initial deposit'}, 
+    # {'amount': -15.5, 'description': 'gas'}]
+    # total_withdraw_categ = 15.5
+    #
+    # total_withdraw = 96.04 + 10.00 + 15.5 = 121.54
+    # categ_perc = {'Food': 79, 'Clothing': 8, 'Auto': 13}
+    #------------------------------------------------------
 
-    #print(categories)
-    
-
-    word_size = []
-    percent = 100
+    # total of withdrawl and percentage
+    categ_perc = {} # key=category | value=total withdraw
     total_withdraw = 0
+
+    for categ in categories:
+        total_withdraw_categ = 0
+        for item in categ.ledger:
+            if item["amount"] < 0:
+                total_withdraw += item["amount"]
+                total_withdraw_categ += item["amount"]
+        categ_perc[categ.category] = abs(total_withdraw_categ)
+    total_withdraw = abs(total_withdraw)
+
+    for key, val in categ_perc.items():
+        percent = (val / total_withdraw) * 100
+        categ_perc[key] = round(percent)
+    
+    list_categ = list(categ_perc.keys())
+    list_percent = list(categ_perc.values())
+
+    # chart with the percentage spent in each category
     chart = "Percentage spent by category\n"
+    percent = 100
 
-    # Percentage calculation
-
-
-
-
-
-
-    percent_category = [ 70, 10, 50]  #### for now
-  
-    # draw the % spent by category
     while percent >= 0:
         chart += str(percent).rjust(3) + "| "
-        for i in range(0,len(percent_category)):
-            if percent_category[i] >= percent:
+        for i in range(0,len(list_percent)):
+            if list_percent[i] >= percent:
                 chart +=  "o".ljust(3)
             else:
                 chart +=  " ".ljust(3)
         chart = (chart.rstrip()) + "\n"            
         percent = percent - 10
-
      
-    # Identify categories 
-    match = re.findall("[*+]\w+[*+]", str(categories))
-
     # horizontal line below the bars
-    chart += "    " + "-".rjust(1 + (3 * len(match)), "-") + "\n"
+    chart += "    " + "-".rjust(1 + (3 * len(list_categ)), "-") + "\n"
 
     # identify maximo length of categories
-    for i in range(0, len(match)):
-        word_size.append(len(match[i])-2)
+    word_size = []
+    for i in range(0, len(list_categ)):
+        word_size.append(len(list_categ[i]))
 
     max_size = max(word_size)
 
     # adjust each category to maximum length
-    for i in range(0, len(match)):
-        match[i] = (match[i].replace("*", "")).ljust(max_size, " ")
+    for i in range(0, len(list_categ)):
+        list_categ[i] = (list_categ[i].replace("*", "")).ljust(max_size, " ")
 
     # display categories vertically 
     for i in range(0, max_size):
       chart += "     "
-      for category in range(0, len(match)):
-        chart += (match[category][i]) + "  "
+      for category in range(0, len(list_categ)):
+        chart += (list_categ[category][i]) + "  "
       chart += "\n"
 
     return chart
