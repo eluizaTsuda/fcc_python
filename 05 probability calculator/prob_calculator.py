@@ -3,33 +3,56 @@ import random
 # Consider using the modules imported above.
 
 class Hat:
-    def __init__(self, **balls_hat):
-        self.contents = []
-        for key, value in balls_hat.items():
-            print ("%s == %s" %(key, value))
-            for i in range(0, int(value)):
-                self.contents.append(key)
-        print(self.contents)
+  def __init__(self,**kwargs):
+    self.contents = []
+    for key, value in kwargs.items():
+      #print ("%s == %s" %(key, value))
+      for i in range(0,int(value)):
+        self.contents.append(key)
+    
+  def draw(self, nrball):
+    
+    if nrball >= len(self.contents):
+      # return "ALL" the balls
+      random_ball = copy.deepcopy(self.contents)
+    else: 
+      # random balls from the contents
+      # return those balls as a list of strings.
+      random_ball = random.sample(self.contents, nrball)
 
-    def draw(self, nrball):
-        if nrball >= len(self.contents):
-            return self.contents
-        
-        remove_balls = []
-        for i in range(nrball):
-            # remove balls self.contents[] and add to remove_balls[]
-            random_ball = int(random.random() * len(self.contents))
-            remove_balls.append(self.contents.pop(random_ball))
-        print(remove_balls)
-        print(self.contents)
-        return remove_balls   
+    for ball in random_ball:
+      # remove balls at random from contents 
+      self.contents.remove(ball)
+
+    return random_ball
 
 def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
-    print(f"hat:................ {hat}")
-    print(f"expected_balls:..... {expected_balls}")
-    print(f"num_balls_drawn:.... {num_balls_drawn}")
-    print(f"num_experiments:.... {num_experiments}")
 
-    probability = 0
+  got_expect_balls_M = 0
 
-    return probability
+  # perform n experiments
+  for i in range(num_experiments):
+  
+    # starting with a hat containing the specified balls
+    hat_copied = copy.deepcopy(hat)
+
+    # obtaining the drawn colors
+    colors_draw = hat_copied.draw(num_balls_drawn)
+
+    draw_color = True
+
+    # checking the balls that were drawn
+    for expected_color in expected_balls.keys():
+
+      # if the amount of colors obtained in the draw is less than 
+      # the expected amount, go to the next experiment
+      if (colors_draw.count(expected_color)) < expected_balls[expected_color]:
+        draw_color = False
+        break
+
+    if draw_color == True:
+      got_expect_balls_M += 1
+ 
+  probability = got_expect_balls_M / num_experiments
+  
+  return probability
